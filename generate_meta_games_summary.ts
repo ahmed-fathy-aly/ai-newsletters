@@ -1,8 +1,7 @@
 // For local testing, uncomment the line below after running: npm install dotenv
 import 'dotenv/config';
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import * as nodemailer from "nodemailer";
+import { callGeminiAPI, parseAIJsonResponse, sendEmail, mockSendEmail, EmailConfig } from './utils';
 
 // Generate HTML from JSON data
 function generateHtmlFromJson(data: any): string {
@@ -109,7 +108,7 @@ function generateHtmlFromJson(data: any): string {
 const GEMINI_API_KEY = process.env.FINAL_GEMINI_API_KEY;
 const SENDER_EMAIL = process.env.SENDER_EMAIL;
 const SENDER_PASSWORD = process.env.SENDER_PASSWORD;
-const RECIPIENT_EMAIL = process.env.RECIPIENT_EMAIL;
+const PERSONAL_NEWSLETTER = process.env.PERSONAL_NEWSLETTER;
 
 // Check if the script was run with the --dry-run flag
 const isDryRun = process.argv.includes('--dry-run');
@@ -119,7 +118,7 @@ if (isDryRun) {
 }
 
 // A check to ensure all variables are loaded correctly
-if (!GEMINI_API_KEY || !SENDER_EMAIL || !SENDER_PASSWORD || !RECIPIENT_EMAIL) {
+if (!GEMINI_API_KEY || !SENDER_EMAIL || !SENDER_PASSWORD || !PERSONAL_NEWSLETTER) {
   console.error("❌ One or more required environment variables are missing.");
   process.exit(1);
 }
@@ -130,11 +129,6 @@ if (!GEMINI_API_KEY || !SENDER_EMAIL || !SENDER_PASSWORD || !RECIPIENT_EMAIL) {
 async function main() {
   try {
     // --- 2. Generate Content with Gemini ---
-    console.log("🤖 Generating content with Gemini...");
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-
-    // A new prompt tailored to the script's name
     const prompt = `Create a gaming newsletter featuring at least 10 games. Return the response as a JSON object with the following structure:
 
 {
@@ -160,80 +154,46 @@ For the storeUrl, provide Meta store URLs using the format "https://www.meta.com
 
 Return ONLY the JSON object, no additional text or formatting.`;
 
-    const result = await model.generateContent(prompt);
-    const jsonResponse = result.response.text();
-    console.log("✅ Content generated successfully.");
+    const jsonResponse = await callGeminiAPI(GEMINI_API_KEY, prompt);
 
     // Parse the JSON response
-    let newsletterData;
-    try {
-      // Clean the response by removing markdown code blocks if present
-      let cleanedResponse = jsonResponse.trim();
-      
-      // Remove ```json and ``` markers if they exist
-      if (cleanedResponse.startsWith('```json')) {
-        cleanedResponse = cleanedResponse.replace(/^```json\s*/, '');
-      }
-      if (cleanedResponse.startsWith('```')) {
-        cleanedResponse = cleanedResponse.replace(/^```\s*/, '');
-      }
-      if (cleanedResponse.endsWith('```')) {
-        cleanedResponse = cleanedResponse.replace(/\s*```$/, '');
-      }
-      
-      newsletterData = JSON.parse(cleanedResponse);
-    } catch (error) {
-      console.error("❌ Failed to parse JSON response:", error);
-      console.log("Raw response:", jsonResponse);
-      throw new Error("Invalid JSON response from AI");
-    }
+    const newsletterData = parseAIJsonResponse(jsonResponse);
 
     // Generate HTML from JSON data
     const htmlContent = generateHtmlFromJson(newsletterData);
+
+    // Create variables needed for email
+    const today = new Date().toLocaleDateString('en-GB');
+    const plainTextContent = `${newsletterData.title}\n\n${newsletterData.subtitle}\n\n` + 
+      newsletterData.games.map((game: any) => 
+        `${game.name}\nScore: ${game.score}/10 | Type: ${game.type}\n${game.description} (${game.reason})\n${game.storeUrl}\n`
+      ).join('\n');
 
 
     // --- 3. Conditionally Send Email or Log to Console ---
     if (isDryRun) {
       // If it's a dry run, just print the summary to the console
-      console.log("\n--- 📧 Mock Email Content ---");
-      console.log(`To: ${RECIPIENT_EMAIL}`);
-      console.log(`Subject: Gaming Newsletter - Latest Games & Updates`);
-      console.log("----------------------------");
-      console.log("📝 JSON Data:");
+      console.log("� JSON Data:");
       console.log(JSON.stringify(newsletterData, null, 2));
-      console.log("\n🌐 HTML Preview:");
-      console.log(htmlContent);
-      console.log("----------------------------");
+      mockSendEmail({
+        senderEmail: SENDER_EMAIL,
+        senderPassword: SENDER_PASSWORD,
+        recipientEmail: PERSONAL_NEWSLETTER,
+        subject: `Gaming Newsletter - Latest Games & Updates for ${today}`,
+        textContent: plainTextContent,
+        htmlContent: htmlContent
+      });
 
     } else {
       // If it's a live run, send the email
-      console.log(`✉️ Preparing to send email from ${SENDER_EMAIL}...`);
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: {
-          user: SENDER_EMAIL,
-          pass: SENDER_PASSWORD,
-        },
-      });
-
-      const today = new Date().toLocaleDateString('en-GB');
-      
-      // Create a plain text version for email fallback
-      const plainTextContent = `${newsletterData.title}\n\n${newsletterData.subtitle}\n\n` + 
-        newsletterData.games.map((game: any) => 
-          `${game.name}\nScore: ${game.score}/10 | Type: ${game.type}\n${game.description} (${game.reason})\n${game.storeUrl}\n`
-        ).join('\n');
-      
-      await transporter.sendMail({
-        from: SENDER_EMAIL, // Simplified to just the email address
-        to: RECIPIENT_EMAIL,
+      await sendEmail({
+        senderEmail: SENDER_EMAIL,
+        senderPassword: SENDER_PASSWORD,
+        recipientEmail: PERSONAL_NEWSLETTER,
         subject: `Gaming Newsletter - Latest Games & Updates for ${today}`,
-        text: plainTextContent, // Plain text fallback
-        html: htmlContent, // HTML version for better formatting
+        textContent: plainTextContent,
+        htmlContent: htmlContent
       });
-      console.log(`🚀 Email sent successfully to ${RECIPIENT_EMAIL}!`);
     }
 
   } catch (error) {
