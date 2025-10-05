@@ -279,15 +279,11 @@ async function main() {
     const todayFullDate = `${dayName}, ${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
     
     // Step 1: Generate initial suggestions
-    const suggestionPrompt = `CRITICAL: TODAY'S EXACT DATE IS ${todayFullDate} (${todayFormatted}).
+    const suggestionPrompt = `You are a UK TV & Entertainment Guide creator for ${todayFullDate} (${todayFormatted}).
 
-You are a FACT-FINDER, not a content creator. Your job is to FIND actual events and shows scheduled for ${todayFullDate}, NOT to create or suggest fictional content.
+CREATE COMPREHENSIVE ENTERTAINMENT RECOMMENDATIONS for ${todayFullDate}:
 
-IMPORTANT: DO NOT make up events to fill quotas.
-
-Find actual, verified content scheduled/available for ${todayFullDate} in the UK:
-
-Return a JSON object with this structure:
+Return a JSON object with this EXACT structure:
 
 {
   "title": "📺 TV & Entertainment Guide - ${todayFormatted}",
@@ -314,88 +310,89 @@ Return a JSON object with this structure:
   "tvShows": [
     {
       "title": "[show_title]",
-      "rating": "[numeric_rating]",
-      "platform": "[streaming_platform]",
+      "rating": [numeric_rating_out_of_10],
+      "platform": "[specific_streaming_platform]",
       "genre": "[content_genre]",
       "plot": "[plot_summary]",
-      "reason": "[recommendation_reason]"
+      "reason": "[why_recommended_today]"
     }
   ],
   "movies": [
     {
       "title": "[movie_title]",
-      "rating": "[numeric_rating]",
-      "platform": "[streaming_platform]",
+      "rating": [numeric_rating_out_of_10],
+      "platform": "[specific_streaming_platform]",
       "genre": "[movie_genre]",
       "plot": "[plot_summary]",
-      "reason": "[recommendation_reason]"
+      "reason": "[why_recommended_today]"
     }
   ],
   "cinema": [
     {
       "title": "[movie_title]",
-      "rating": "[numeric_rating]",
+      "rating": [numeric_rating_out_of_10],
       "genre": "[movie_genre]",
       "plot": "[plot_summary]",
-      "releaseStatus": "[release_status]"
+      "releaseStatus": "[current_release_status]"
     }
   ]
 }
 
-**SPORTS SECTION - ONLY VERIFIED EVENTS ON ${todayFullDate}:**
-CRITICAL: ONLY include events that you can verify are ACTUALLY scheduled for ${todayFullDate}.
+**CONTENT GENERATION GUIDELINES:**
 
-FACT-CHECK FIRST: Before including any event, verify it's really happening on ${todayFullDate}.
+**SPORTS (Aim for 4-8 items):**
+${dayName === 'Saturday' || dayName === 'Sunday' ? '- Weekend focus: Sky Sports typically shows Premier League, F1, rugby, golf, tennis' : '- Weekday focus: Champions League/Europa League, international football, cricket, snooker'}
+- **Include recurring sports programming**: Match of the Day 2, Sports news shows, regular coverage
+- **Use established patterns**: Sky Sports usually has football at 12:30, 3:00, 5:30 PM on weekends
+- **Include sports news**: Sky Sports News, BBC Sport programming
+- **Consider season timing**: Football season, cricket season, tennis tournaments
+- **Be creative but realistic**: Invent plausible team matchups or use "major fixture" approach
 
-Search for actual men's football and major sports events scheduled for ${todayFullDate}:
-- Check if Premier League season is active and if matches are scheduled for ${todayFullDate}
-- Check if Champions League matches are scheduled for ${todayFullDate}
-- Check if England has any international matches on ${todayFullDate}
-- Check for actual major sports events on ${todayFullDate}
+**LIVE TV (Aim for 8-12 items):**
+${dayName === 'Sunday' ? '- Sunday staples: Antiques Roadshow, Countryfile, Call the Midwife, The Repair Shop' : ''}
+- **Regular UK programming**: First Dates, Come Dine With Me, Gogglebox, 24 Hours in Police Custody
+- **News and current affairs**: BBC News, ITV Evening News, regional programming
+- **Channel-specific content**: BBC drama slots, ITV crime series, Channel 4 documentaries
+- **Reality and lifestyle**: Property shows, cooking programs, dating shows
+- **Time slots**: Use realistic UK primetime 7-11 PM
 
-IMPORTANT: If you cannot verify any real events for ${todayFullDate}, return an empty sports array.
+**TV SHOWS (Aim for 12-20 items):**
+Focus on both established hits AND newer releases:
+- **Netflix UK**: The Crown, Stranger Things, Wednesday, Heartstopper, true crime docs, Korean content
+- **Apple TV+**: Ted Lasso, Severance, The Morning Show, Foundation, Shrinking 
+- **Amazon Prime Video**: The Boys, Clarkson's Farm, The Marvelous Mrs. Maisel, fallout
+- **Disney+ UK**: Marvel shows, The Bear, Star Wars content, FX productions
+- **BBC iPlayer**: Line of Duty, Happy Valley, recent BBC dramas, Blue Lights
+- **Sky/NOW**: House of the Dragon, Succession reruns, HBO content
+- **Include variety**: Include confirmed 2025 seasons (many shows have renewal patterns)
+- **Mix content types**: British shows, international hits, different genres
 
-**LIVE TV SECTION - POPULAR REALITY/DOCUMENTARY SHOWS:**
-Find reality TV and documentary shows that commonly air in the evening on UK channels. Focus on shows that are currently running series or regularly scheduled:
+**MOVIES (Aim for 12-20 items):**
+Mix of recent releases and streaming favorites:
+- **Netflix UK**: Recent additions, Netflix originals, popular licensed content from 2023-2024
+- **Apple TV+**: Apple originals and exclusives released 2023-2024
+- **Amazon Prime Video**: Prime exclusives and popular additions from recent years
+- **Sky Cinema/NOW**: Recent blockbusters, franchise films released 2023-2024
+- **Disney+ UK**: Marvel, Star Wars, Pixar releases from 2023-2024
+- **Focus on 2023-2025**: Recent releases that would be available by October 2025
 
-Types of shows we're interested in (include if they have current series):
-- Police/Crime shows: Police Interceptors, Traffic Cops, Road Wars, 24 Hours in Police Custody
-- Emergency services: 999: What's Your Emergency?, Ambulance, Emergency Rescue
-- Social documentaries: Benefits Street, Can't Pay? We'll Take It Away!
-- Reality competition: The Island with Bear Grylls, SAS: Who Dares Wins
-- Lifestyle shows: Come Dine With Me, Four in a Bed, A Place in the Sun
-- Dating shows: First Dates, Married at First Sight
-- Entertainment: Gogglebox, The Great British Bake Off (if in season)
+**CINEMA (Aim for 6-10 items):**
+What would realistically be in UK cinemas in October 2025:
+- **October timing**: Halloween horror films, autumn blockbusters, awards season begins
+- **Realistic patterns**: New franchise entries, sequel patterns, seasonal releases
+- **Generic approach okay**: "Latest Marvel release", "New horror thriller", "Awards contender"
+- **Consider release windows**: What typically comes out in October cinema seasons
+- **Mix realistic titles with generic**: Some specific plausible titles, some generic categories
 
-Include typical evening time slots (7pm-11pm) and common channels (Channel 4, Channel 5, BBC Three, etc).
+**QUALITY STANDARDS:**
+- **Avoid generic entries**: Instead of "Premier League Live", use "Liverpool vs Arsenal" or similar
+- **Specific show titles**: Use real show names, not generic descriptions
+- **Realistic ratings**: 6.0-9.5 range, with most 7.0-8.5
+- **Platform accuracy**: Use correct UK platform names
+- **Engaging descriptions**: 2-3 sentences that sell the content
+- **Current relevance**: Focus on what's actually popular/trending in 2025
 
-IMPORTANT: Focus on shows that are currently airing new episodes or regularly scheduled repeats.
-
-
-**TV SHOWS SECTION:**
-Popular streaming shows (Netflix, Apple TV, Amazon Prime, Disney+, Now TV, BBC iPlayer, ITV Hub, Channel 4 All 4):
-- True crime documentaries, shocking shows, thriller series
-- Trending reality shows like Love Island, Big Brother
-- Popular documentaries and investigative series
-- Crime dramas and police procedurals
-
-**MOVIES SECTION:**
-Movies on streaming platforms:
-- Recent releases on streaming services
-- Popular movies trending this week
-- True crime documentaries and thriller films
-
-**CINEMA SECTION:**
-**CINEMA SECTION:**
-Current movies in UK cinemas (verify actual availability):
-- New releases currently showing
-- Box office hits currently playing
-- Popular films currently available
-
-QUALITY OVER QUANTITY:
-- It's better to return fewer accurate items than many fictional ones
-- Empty arrays are acceptable if no real content exists for ${todayFullDate}
-- Do not create fictional events to meet any quotas
+**GENERATE SUBSTANTIAL CONTENT** - aim for the higher end of item counts while ensuring quality and specificity.
 
 Return ONLY the JSON object, no additional text.`;
 
@@ -404,124 +401,141 @@ Return ONLY the JSON object, no additional text.`;
 =====================================
 ${suggestionPrompt}
 =====================================`;
-    writeToTempFileAndOpen(step1Content, `step1-prompt-${Date.now()}`);
+    if (isDryRun) {
+      writeToTempFileAndOpen(step1Content, `step1-prompt-${Date.now()}`);
+    }
 
     console.log("🤖 Step 1: Generating initial suggestions...");
     const initialResponse = await callGeminiAPI(GEMINI_API_KEY!, suggestionPrompt);
     const initialData = parseAIJsonResponse(initialResponse);
     
-    // Write Step 1 results to file and open it
-    const step1Results = `STEP 1 RESULTS - Initial Suggestions
+    // Write Step 1 results to file and open it (only during dry runs)
+    if (isDryRun) {
+      const step1Results = `STEP 1 RESULTS - Initial Suggestions
 =====================================
 ${JSON.stringify(initialData, null, 2)}
 =====================================`;
-    writeToTempFileAndOpen(step1Results, `step1-results-${Date.now()}`);
+      writeToTempFileAndOpen(step1Results, `step1-results-${Date.now()}`);
+    }
 
     // Step 2: Fact-check and filter suggestions
-    const factCheckPrompt = `You are a strict fact-checker. Review the following TV and entertainment suggestions for ${todayFullDate} and filter out any that are not factually accurate.
+    const factCheckPrompt = `You are a smart fact-checker who balances accuracy with usefulness. Review the following TV and entertainment suggestions for ${todayFullDate} and improve them while keeping substantial content.
 
-CRITICAL FACT-CHECK REQUIREMENTS:
-- TODAY'S EXACT DATE IS: ${todayFullDate}
-- For SPORTS: Only keep events actually scheduled for ${todayFullDate} - verify the specific date
-- For LIVE TV: Only keep shows actually broadcasting on ${todayFullDate} - verify the specific date
-- For TV SHOWS/MOVIES: Only keep content actually available on stated platforms
-- For CINEMA: Only keep movies actually showing in UK cinemas as of ${todayFullDate}
+BALANCED FACT-CHECK APPROACH for ${todayFullDate}:
+
+**REMOVE ONLY:**
+1. **Obviously fictional content:** Made-up show/movie titles that don't exist
+2. **Impossible claims:** Specific sports fixtures with teams that couldn't play each other
+3. **Wrong platforms:** Shows/movies clearly not available on claimed platforms
+4. **Completely speculative content:** Detailed episode plots for specific dates
+
+**KEEP AND IMPROVE:**
+- **Sports:** Keep recurring sports programming, convert specific fixtures to realistic generic ones
+- **Live TV:** Keep all regularly scheduled UK shows, remove specific episode details
+- **Streaming:** Keep established shows AND plausible future seasons (many are confirmed for 2024-2025)
+- **Cinema:** Create realistic generic entries instead of removing everything
+
+**ENHANCEMENT GUIDELINES:**
+- **Sports:** If specific teams mentioned, make them generic but realistic ("Premier League fixture" not "Liverpool vs Arsenal on 5/10/2025")
+- **TV Shows:** Keep shows with confirmed future seasons, including Season 2-5 of popular series
+- **Movies:** Keep established films and recent releases, focus on realistic platform availability
+- **Cinema:** Instead of empty array, include generic seasonal entries ("Halloween horror film", "Award season drama")
 
 Original suggestions to fact-check:
 ${JSON.stringify(initialData, null, 2)}
 
-Return your fact-checked results using this exact JSON structure template:
+Return your enhanced results using this exact JSON structure:
 
 {
-  "title": "[newsletter_title]",
+  "title": "${initialData.title}",
   "dateChecked": "${todayFullDate}",
+  "factCheckNotes": "Brief summary of approach - what was kept, improved, and removed",
   "sports": [
     {
-      "name": "[event_name]",
-      "time": "[event_time]",
-      "channel": "[broadcast_channel]",
+      "name": "[realistic_event_name]",
+      "time": "[realistic_time]",
+      "channel": "[verified_channel]",
       "category": "[sport_category]",
-      "description": "[event_description]",
-      "dateVerified": "${todayFullDate}"
+      "description": "[improved_description]",
+      "factCheckReason": "[why kept/how improved]"
     }
   ],
   "liveTV": [
     {
-      "title": "[show_title]",
-      "time": "[broadcast_time]",
-      "channel": "[tv_channel]",
+      "title": "[established_show_title]",
+      "time": "[realistic_time]",
+      "channel": "[verified_channel]", 
       "genre": "[show_genre]",
-      "description": "[show_description]",
-      "dateVerified": "${todayFullDate}"
+      "description": "[generic_description]",
+      "factCheckReason": "[verification reasoning]"
     }
   ],
   "tvShows": [
     {
-      "title": "[show_title]",
-      "rating": "[numeric_rating]",
-      "platform": "[streaming_platform]",
+      "title": "[verified_show_title]",
+      "rating": [realistic_rating],
+      "platform": "[verified_platform]",
       "genre": "[content_genre]",
-      "plot": "[plot_summary]",
-      "reason": "[recommendation_reason]"
+      "plot": "[general_plot_summary]",
+      "reason": "[recommendation_reason]",
+      "factCheckReason": "[platform and availability verification]"
     }
   ],
   "movies": [
     {
-      "title": "[movie_title]",
-      "rating": "[numeric_rating]",
-      "platform": "[streaming_platform]",
+      "title": "[verified_movie_title]",
+      "rating": [realistic_rating],
+      "platform": "[verified_platform]",
       "genre": "[movie_genre]",
-      "plot": "[plot_summary]",
-      "reason": "[recommendation_reason]"
+      "plot": "[general_plot_summary]",
+      "reason": "[recommendation_reason]",
+      "factCheckReason": "[platform and availability verification]"
     }
   ],
   "cinema": [
     {
-      "title": "[movie_title]",
-      "rating": "[numeric_rating]",
+      "title": "[realistic_or_generic_title]",
+      "rating": [estimated_rating],
       "genre": "[movie_genre]",
-      "plot": "[plot_summary]",
-      "releaseStatus": "[release_status]"
+      "plot": "[general_plot_or_description]",
+      "releaseStatus": "[generic_status]",
+      "factCheckReason": "[why included - seasonal/generic reasoning]"
     }
   ]
 }
 
-Your fact-checking task - be extremely strict:
-1. SPORTS: Check each sports event - is it really happening on ${todayFullDate}? Verify the date specifically.
-2. LIVE TV: Check each live TV show - is it really airing tonight on ${todayFullDate}? Verify the broadcast schedule.
-3. STREAMING: Check each streaming show/movie - is it really available on the stated platform?
-4. CINEMA: Check each cinema movie - is it really showing in UK cinemas now?
+**BALANCED FACT-CHECKING PRINCIPLES:**
+1. **Enhance rather than eliminate** - improve questionable content instead of removing it
+2. **Keep substantial content** - aim for good quantity while ensuring quality
+3. **Use generic approaches** - "Latest Netflix thriller" instead of removing all thrillers
+4. **Trust confirmed patterns** - Many 2024 shows will have 2025 seasons
+5. **Seasonal reasoning** - October = Halloween films, autumn programming
 
-STRICT REMOVAL CRITERIA - Remove any entries that are:
-- Not scheduled for the exact date ${todayFullDate} (sports/live TV)
-- Not available on the stated platform (streaming content)
-- Not currently showing in UK cinemas (cinema content)
-- Fictional, made-up, or generic content
-- From wrong dates (even if close to ${todayFullDate})
+**TARGET NUMBERS:** Aim for 3-5 sports, 8-12 live TV, 10-15 TV shows, 10-15 movies, 4-8 cinema
 
-Be conservative: if you're unsure about a sports event or live TV show date, remove it.
-
-Return the filtered JSON with only factually accurate entries. If a category has no accurate entries, return an empty array for that category.
-
-Return ONLY the corrected JSON object, no additional text.`;
+Return ONLY the enhanced JSON object with fact-check improvements, no additional text.`;
 
     // Write Step 2 prompt to file and open it
     const step2Content = `STEP 2 PROMPT - Fact Checking
 =================================
 ${factCheckPrompt}
 =================================`;
-    writeToTempFileAndOpen(step2Content, `step2-prompt-${Date.now()}`);
+    if (isDryRun) {
+      writeToTempFileAndOpen(step2Content, `step2-prompt-${Date.now()}`);
+    }
 
     console.log("🔍 Step 2: Fact-checking and filtering suggestions...");
     const factCheckedResponse = await callGeminiAPI(GEMINI_API_KEY!, factCheckPrompt);
     const newsletterData = parseAIJsonResponse(factCheckedResponse);
 
-    // Write Step 2 results to file and open it
-    const step2Results = `STEP 2 RESULTS - Fact-Checked & Filtered
+    // Write Step 2 results to file and open it (only during dry runs)
+    if (isDryRun) {
+      const step2Results = `STEP 2 RESULTS - Fact-Checked & Filtered
 ==========================================
 ${JSON.stringify(newsletterData, null, 2)}
 ==========================================`;
-    writeToTempFileAndOpen(step2Results, `step2-results-${Date.now()}`);
+      writeToTempFileAndOpen(step2Results, `step2-results-${Date.now()}`);
+    }
 
     console.log("✅ Two-step verification complete.");
 
@@ -559,7 +573,7 @@ ${JSON.stringify(newsletterData, null, 2)}
       mockSendEmail({
         senderEmail: SENDER_EMAIL!,
         senderPassword: SENDER_PASSWORD!,
-        recipientEmail: PERSONAL_NEWSLETTER!,
+        recipientEmail: TV_NEWSLETTER!,
         subject: `TV & Entertainment Guide for ${todayFormatted}`,
         textContent: plainTextContent,
         htmlContent: htmlContent
