@@ -27,7 +27,7 @@ export async function callGeminiAPI(apiKey: string, prompt: string): Promise<str
   console.log("🤖 Generating content with Gemini...");
   
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const result = await model.generateContent(prompt);
   const response = result.response.text();
@@ -57,10 +57,20 @@ export function parseAIJsonResponse(jsonResponse: string): any {
       cleanedResponse = cleanedResponse.replace(/\s*```$/, '');
     }
     
-    return JSON.parse(cleanedResponse);
+    // Remove control characters that can break JSON parsing
+    cleanedResponse = cleanedResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+    
+    // Try to find JSON object in the response if direct parsing fails
+    let jsonToParseALternative = cleanedResponse;
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonToParseALternative = jsonMatch[0];
+    }
+    
+    return JSON.parse(jsonToParseALternative);
   } catch (error) {
     console.error("❌ Failed to parse JSON response:", error);
-    console.log("Raw response:", jsonResponse);
+    console.log("Raw response first 500 chars:", jsonResponse.substring(0, 500));
     throw new Error("Invalid JSON response from AI");
   }
 }

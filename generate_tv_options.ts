@@ -279,7 +279,13 @@ async function main() {
     const todayFullDate = `${dayName}, ${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
     
     // Step 1: Generate initial suggestions
-    const suggestionPrompt = `You are a UK TV & Entertainment Guide creator for ${todayFullDate} (${todayFormatted}).
+    const suggestionPrompt = `You are a highly skilled UK TV & Entertainment Guide creator, tasked with generating a comprehensive and meticulously structured UK TV & Entertainment Guide for ${todayFullDate} (${todayFormatted}). Your expertise is critical in crafting compelling, realistic recommendations that rigorously adhere to specific content quantities and focus on verified, existing content that would realistically be available on the specified date.
+
+UK CONTENT AUTHENTICITY GUIDELINES:
+- **Real Content Only**: Focus exclusively on existing shows, movies, and programs that would realistically be available or airing on ${todayFullDate}
+- **Channel & Platform Accuracy**: Use only verified UK channels and streaming platforms with content that actually exists on those services
+- **UK Broadcasting Patterns**: Follow established UK broadcasting schedules and typical programming patterns for ${dayName}s
+- **Seasonal Appropriateness**: Consider what content would realistically be scheduled for October 2025
 
 CREATE COMPREHENSIVE ENTERTAINMENT RECOMMENDATIONS for ${todayFullDate}:
 
@@ -338,61 +344,40 @@ Return a JSON object with this EXACT structure:
   ]
 }
 
-**CONTENT GENERATION GUIDELINES:**
+CONTENT GENERATION GUIDELINES:
 
-**SPORTS (Aim for 4-8 items):**
-${dayName === 'Saturday' || dayName === 'Sunday' ? '- Weekend focus: Sky Sports typically shows Premier League, F1, rugby, golf, tennis' : '- Weekday focus: Champions League/Europa League, international football, cricket, snooker'}
-- **Include recurring sports programming**: Match of the Day 2, Sports news shows, regular coverage
-- **Use established patterns**: Sky Sports usually has football at 12:30, 3:00, 5:30 PM on weekends
-- **Include sports news**: Sky Sports News, BBC Sport programming
-- **Consider season timing**: Football season, cricket season, tennis tournaments
-- **Be creative but realistic**: Invent plausible team matchups or use "major fixture" approach
+SPORTS (Generate 6 items):
+- Generate **exactly 6** sports items using real, established sporting events, leagues, and programming that would typically be broadcast on ${dayName === 'Saturday' || dayName === 'Sunday' ? 'a weekend' : 'a weekday'} in October 2025
+- Focus on recurring sports programming, established league fixtures, and ongoing tournaments that would be in season
+- Include regular sports news programming and established sports shows
 
-**LIVE TV (Aim for 8-12 items):**
-${dayName === 'Sunday' ? '- Sunday staples: Antiques Roadshow, Countryfile, Call the Midwife, The Repair Shop' : ''}
-- **Regular UK programming**: First Dates, Come Dine With Me, Gogglebox, 24 Hours in Police Custody
-- **News and current affairs**: BBC News, ITV Evening News, regional programming
-- **Channel-specific content**: BBC drama slots, ITV crime series, Channel 4 documentaries
-- **Reality and lifestyle**: Property shows, cooking programs, dating shows
-- **Time slots**: Use realistic UK primetime 7-11 PM
+LIVE TV (Generate 10 items):
+- Generate **exactly 10** Live TV items featuring real, established UK television programs across major channels
+- Focus on regular programming that typically airs on ${dayName}s, including established series, news programs, and recurring shows
+- Use realistic UK primetime scheduling and established program formats
 
-**TV SHOWS (Aim for 12-20 items):**
-Focus on both established hits AND newer releases:
-- **Netflix UK**: The Crown, Stranger Things, Wednesday, Heartstopper, true crime docs, Korean content
-- **Apple TV+**: Ted Lasso, Severance, The Morning Show, Foundation, Shrinking 
-- **Amazon Prime Video**: The Boys, Clarkson's Farm, The Marvelous Mrs. Maisel, fallout
-- **Disney+ UK**: Marvel shows, The Bear, Star Wars content, FX productions
-- **BBC iPlayer**: Line of Duty, Happy Valley, recent BBC dramas, Blue Lights
-- **Sky/NOW**: House of the Dragon, Succession reruns, HBO content
-- **Include variety**: Include confirmed 2025 seasons (many shows have renewal patterns)
-- **Mix content types**: British shows, international hits, different genres
+TV SHOWS (Generate 18 items):
+- Generate **exactly 18** TV show recommendations featuring real, existing series that would be available on streaming platforms by October 2025
+- Focus on established shows, confirmed seasons, and content that has been officially announced or is part of ongoing series
+- Include content from Netflix UK, Apple TV+, Amazon Prime Video, Disney+ UK, BBC iPlayer, Sky/NOW using their actual catalogs
 
-**MOVIES (Aim for 12-20 items):**
-Mix of recent releases and streaming favorites:
-- **Netflix UK**: Recent additions, Netflix originals, popular licensed content from 2023-2024
-- **Apple TV+**: Apple originals and exclusives released 2023-2024
-- **Amazon Prime Video**: Prime exclusives and popular additions from recent years
-- **Sky Cinema/NOW**: Recent blockbusters, franchise films released 2023-2024
-- **Disney+ UK**: Marvel, Star Wars, Pixar releases from 2023-2024
-- **Focus on 2023-2025**: Recent releases that would be available by October 2025
+MOVIES (Generate 18 items):
+- Generate **exactly 18** movie recommendations featuring real films that would be available on streaming platforms by October 2025
+- Focus on existing movies, recent releases that would have moved to streaming, and established catalog content
+- Use real films from Netflix UK, Apple TV+, Amazon Prime Video, Disney+ UK, Sky Cinema/NOW
 
-**CINEMA (Aim for 6-10 items):**
-What would realistically be in UK cinemas in October 2025:
-- **October timing**: Halloween horror films, autumn blockbusters, awards season begins
-- **Realistic patterns**: New franchise entries, sequel patterns, seasonal releases
-- **Generic approach okay**: "Latest Marvel release", "New horror thriller", "Awards contender"
-- **Consider release windows**: What typically comes out in October cinema seasons
-- **Mix realistic titles with generic**: Some specific plausible titles, some generic categories
+CINEMA (Generate 8 items):
+- Generate **exactly 8** cinema items featuring real movies that would realistically be showing in UK cinemas in October 2025
+- Focus on actual film releases, established franchises with confirmed release patterns, and real movies that would be in theaters
 
-**QUALITY STANDARDS:**
-- **Avoid generic entries**: Instead of "Premier League Live", use "Liverpool vs Arsenal" or similar
-- **Specific show titles**: Use real show names, not generic descriptions
-- **Realistic ratings**: 6.0-9.5 range, with most 7.0-8.5
-- **Platform accuracy**: Use correct UK platform names
-- **Engaging descriptions**: 2-3 sentences that sell the content
-- **Current relevance**: Focus on what's actually popular/trending in 2025
-
-**GENERATE SUBSTANTIAL CONTENT** - aim for the higher end of item counts while ensuring quality and specificity.
+QUALITY STANDARDS:
+- **Quantity Precision**: Ensure the generated JSON contains *exactly* the specified number of items for each category
+- **Real Content Only**: All entries must be existing, real content - no fictional or made-up titles
+- **Accurate Details**: All show titles, movie titles, channels, and platforms must be factually correct
+- **Realistic scheduling**: Use realistic broadcast times and channel assignments for live TV
+- **Realistic ratings**: 6.0-9.5 range, with most 7.0-8.5, based on actual content quality
+- **Platform accuracy**: Use correct UK platform names and verify content availability
+- **Engaging descriptions**: 2-3 sentences that accurately describe the real content
 
 Return ONLY the JSON object, no additional text.`;
 
