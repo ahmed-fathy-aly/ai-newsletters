@@ -1,0 +1,26 @@
+{
+  "name": "ai-newsletters",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmed-fathy-aly/ai-newsletters.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ahmed-fathy-aly/ai-newsletters/issues"
+  },
+  "homepage": "https://github.com/ahmed-fathy-aly/ai-newsletters#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.2.3",
+    "nodemailer": "^7.0.6"
+  }
+}
