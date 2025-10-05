@@ -135,3 +135,41 @@ export function mockSendEmail(config: EmailConfig): void {
   
   console.log("----------------------------");
 }
+
+/**
+ * Write content to a temporary text file and open it with the default text editor
+ * @param content - The text content to write to the file
+ * @param fileName - Optional custom filename (without extension)
+ * @returns The path to the created file
+ */
+export function writeToTempFileAndOpen(content: string, fileName?: string): string {
+  try {
+    // Create a temporary text file
+    const tempDir = os.tmpdir();
+    const baseFileName = fileName || `temp-content-${Date.now()}`;
+    const fullFileName = `${baseFileName}.txt`;
+    const filePath = path.join(tempDir, fullFileName);
+    
+    // Write content to file
+    fs.writeFileSync(filePath, content, 'utf8');
+    
+    console.log(`📄 Text file created: ${filePath}`);
+    
+    // Open the file with the default text editor (Windows)
+    const openCommand = `start "" "${filePath}"`;
+    
+    exec(openCommand, (error) => {
+      if (error) {
+        console.log("❌ Failed to open text editor automatically.");
+        console.log(`You can manually open this file: ${filePath}`);
+      } else {
+        console.log("✅ Text file opened in default editor!");
+      }
+    });
+    
+    return filePath;
+  } catch (error) {
+    console.error("❌ Failed to create temporary text file:", error);
+    throw error;
+  }
+}
