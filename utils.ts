@@ -1,5 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as nodemailer from "nodemailer";
+import { exec } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import * as os from "os";
 
 /**
  * Interface for email configuration
@@ -68,7 +72,7 @@ export function parseAIJsonResponse(jsonResponse: string): any {
 export async function sendEmail(config: EmailConfig): Promise<void> {
   console.log(`✉️ Preparing to send email from ${config.senderEmail}...`);
   
-  const transporter = nodemailer.createTransporter({
+  const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
@@ -90,7 +94,7 @@ export async function sendEmail(config: EmailConfig): Promise<void> {
 }
 
 /**
- * Mock sending an email by logging the content to console
+ * Mock sending an email by logging the content to console and opening HTML preview in browser
  * @param config - Email configuration object
  */
 export function mockSendEmail(config: EmailConfig): void {
@@ -100,7 +104,34 @@ export function mockSendEmail(config: EmailConfig): void {
   console.log("----------------------------");
   console.log("📝 Text Content:");
   console.log(config.textContent);
-  console.log("\n🌐 HTML Content:");
-  console.log(config.htmlContent);
+  console.log("\n🌐 Creating HTML preview file...");
+  
+  try {
+    // Create a temporary HTML file
+    const tempDir = os.tmpdir();
+    const fileName = `email-preview-${Date.now()}.html`;
+    const filePath = path.join(tempDir, fileName);
+    
+    // Write HTML content to file
+    fs.writeFileSync(filePath, config.htmlContent, 'utf8');
+    
+    console.log(`📄 HTML file created: ${filePath}`);
+    
+    // Open the file with the default browser (Windows)
+    const openCommand = `start "" "${filePath}"`;
+    
+    exec(openCommand, (error) => {
+      if (error) {
+        console.log("❌ Failed to open browser automatically.");
+        console.log(`You can manually open this file: ${filePath}`);
+      } else {
+        console.log("✅ HTML preview opened in default browser!");
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Failed to create HTML preview file:", error);
+  }
+  
   console.log("----------------------------");
 }
