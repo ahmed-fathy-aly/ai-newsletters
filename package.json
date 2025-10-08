@@ -20,6 +20,7 @@
   "homepage": "https://github.com/ahmed-fathy-aly/ai-newsletters#readme",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.0",
     "dotenv": "^17.2.3",
     "nodemailer": "^7.0.6"
   },

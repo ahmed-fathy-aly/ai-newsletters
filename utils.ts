@@ -4,6 +4,7 @@ import { exec } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import axios from 'axios';
 
 /**
  * Interface for email configuration
@@ -144,6 +145,58 @@ export function mockSendEmail(config: EmailConfig): void {
   }
   
   console.log("----------------------------");
+}
+
+
+/**
+ * Sends an SMS message using Textlocal.
+ * @param to - The recipient's phone number (e.g., '+447987654321').
+ * @param body - The text content of the message.
+ */
+export async function sendSms(to: string, body: string): Promise<void> {
+  // Textlocal SMS setup (environment variables)
+  const apiKey = process.env.TEXTLOCAL_API_KEY;
+  console.log('API Key:', apiKey); // Debugging line to check if API key is loaded
+  const senderName = process.env.TEXTLOCAL_SENDER_NAME;
+  const myNumber = process.env.MY_PHONE_NUMBER;
+
+// Input validation: Ensure all required environment variables are set
+  if (!apiKey || !senderName || !myNumber) {
+    throw new Error("Missing required environment variables: TEXTLOCAL_API_KEY, TEXTLOCAL_SENDER_NAME, and MY_PHONE_NUMBER must be set in your .env file");
+  }
+
+  console.log(`Attempting to send message via Webex Interact: "${body}"`);
+
+  // Webex Interact API endpoint
+  const url = 'https://api.webexinteract.com/v1/sms';
+
+  // The payload as JSON
+  const payload = {
+    message_body: body,
+    from: senderName,
+    to: [
+      {
+        phone: [to],
+      },
+    ],
+    skip_optout_check: true,
+  };
+
+  try {
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-AUTH-KEY': apiKey,
+      },
+    });
+
+    // Assuming success if no error
+    console.log('✅ Message sent successfully!');
+    console.log('Response:', response.data);
+  } catch (error) {
+    console.error('❌ An error occurred while making the API request:', (error as Error).message);
+    throw error;
+  }
 }
 
 /**
