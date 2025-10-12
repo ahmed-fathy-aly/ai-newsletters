@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Ashford events (dry-run)",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"ashford:dry"
+			],
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		}
+	]
+}

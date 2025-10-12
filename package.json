@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ashford": "tsx ./generate_ashford_events.ts",
+    "ashford:dry": "tsx ./generate_ashford_events.ts --dry-run"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
-    "@types/nodemailer": "^7.0.2"
+    "@types/nodemailer": "^7.0.2",
+    "tsx": "^4.19.2"
   }
 }
